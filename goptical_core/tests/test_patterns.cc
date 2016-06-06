@@ -26,7 +26,10 @@
 #include <cstring>
 #include <stdlib.h>
 
+#ifndef CMAKE_BUILD
 #include "config.hh"
+#endif
+
 
 #include <Goptical/Io/RendererViewport>
 #include <Goptical/Io/RendererSvg>

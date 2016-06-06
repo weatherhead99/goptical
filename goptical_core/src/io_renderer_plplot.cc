@@ -188,7 +188,12 @@ namespace _Goptical {
                                      const Rgb &rgb, bool filled)
     {
       _pls->col0(get_color_id(rgb));
-      _pls->arc(c.x(), c.y(), r, r, 0., 360., filled);
+      
+      //fix not building against plplot
+      //TODO: find out which version breaks it?
+      _pls->arc(c.x(),c.y(),r,r,0,360.,0.,filled);
+      
+//       _pls->arc(c.x(), c.y(), r, r, 0., 360., filled);
     }
 
     void RendererPlplot::draw_polygon(const Math::Vector2 *array, unsigned int count,

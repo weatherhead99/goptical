@@ -22,7 +22,13 @@
 
 */
 
+#ifndef CMAKE_BUILD
 #include "config.hh"
+#endif
+
+
+
+
 
 #include <Goptical/Io/Renderer>
 #include <Goptical/Io/RendererViewport>
