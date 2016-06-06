@@ -27,6 +27,8 @@ find_library(dime dime)
 if(dime STREQUAL "dime-NOTFOUND")
 message(WARNING "dime not found. Building without DXF support")
 set(NO_DXF TRUE)
+else()
+add_definitions(-DGOPTICAL_HAVE_DIME)
 endif()
 
 #libGD for GD export
@@ -34,6 +36,8 @@ find_library(gd gd)
 if(gd STREQUAL "gd-NOTFOUND")
 message(WARNING "gd not found. Building without GD rendering support")
 set(NO_GD TRUE)
+else()
+add_definitions(-DGOPTICAL_HAVE_GD)
 endif()
 
 #plplot
@@ -43,6 +47,8 @@ find_package(PLplot)
 if(NOT ${PLplot-FOUND})
 message(WARNING "plplot not found. Building without plplot support")
 set(NO_PLPLOT TRUE)
+else()
+add_definitions(-DGOPTICAL_HAVE_PLPLOT)
 endif()
 
 
