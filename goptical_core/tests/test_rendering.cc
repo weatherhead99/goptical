@@ -51,6 +51,10 @@
 #include <Goptical/Math/Vector>
 #include <Goptical/Math/VectorPair>
 
+//sleep() not defined unless including "unistd"
+#include <unistd.h>
+
+
 using namespace Goptical;
 
 void test_text_(Io::Renderer &r, const Math::Vector2 &pos, Io::TextAlignMask a)

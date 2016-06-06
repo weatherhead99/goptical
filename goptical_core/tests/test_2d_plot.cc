@@ -27,7 +27,8 @@
 #endif
 
 
-
+//sleep() not defined unless including "unistd"
+#include <unistd.h>
 
 
 #include <Goptical/Io/Renderer>
