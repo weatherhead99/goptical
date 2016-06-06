@@ -28,7 +28,9 @@ endif()
 
 
 add_library(goptical_core ${goptical_core_srcs})
-target_link_libraries(goptical_core gsl gslcblas)
+
+target_link_libraries(goptical_core  gsl gslcblas ${PLplot_LIBRARIES} )
+
 
 
 if(BUILD_TESTS)
@@ -37,10 +39,13 @@ set(goptical_core_test_srcs tests/test_2d_plot.cc tests/test_coordinates.cc test
 			    tests/test_patterns.cc tests/test_rendering.cc tests/test_shapes.cc)
 			    
 foreach(testsrc ${goptical_core_test_srcs})
-
+    get_filename_component(testsrc_abs ${testsrc} ABSOLUTE)
     get_filename_component(testname ${testsrc} NAME_WE)
-    add_executable(${testname} ${testsrc})
+    message(STATUS "adding test: ${testname} from source ${testsrc_abs}")
+    add_executable(${testname} ${testsrc_abs})
     target_link_libraries(${testname} goptical_core)
 
 endforeach()
+   
+
 endif()
