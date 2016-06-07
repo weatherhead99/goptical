@@ -43,9 +43,7 @@
 #ifdef GOPTICAL_HAVE_GD
 #include <Goptical/Io/RendererGd>
 #endif
-#ifdef GOPTICAL_HAVE_PLPLOT
-#include <Goptical/Io/RendererPlplot>
-#endif
+
 #ifdef GOPTICAL_HAVE_X11
 #include <Goptical/Io/RendererX11>
 #endif

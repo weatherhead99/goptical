@@ -18,34 +18,42 @@ src/curve_sphere.cc	    src/io_renderer_plplot.cc  src/material_mirror.cc		 src/
 src/curve_spline.cc	    src/io_renderer_svg.cc     src/material_proxy.cc		 src/sys_container.cc)
 
 
-if(NOT NO_DXF)
+if(NOT NO_dime)
 list(APPEND goptical_core_srcs src/io_renderer_dxf.cc)
 endif()
 
-if(NOT NO_GD)
+if(NOT NO_gd)
 list(APPEND goptical_core_srcs src/io_renderer_gd.cc)
 endif()
 
 
-add_library(goptical_core ${goptical_core_srcs})
-
-target_link_libraries(goptical_core  gsl gslcblas ${PLplot_LIBRARIES} )
+add_library(goptical_core SHARED ${goptical_core_srcs})
+target_link_libraries(goptical_core  gsl gslcblas ${X11_LIBRARIES} ${OPENGL_LIBRARIES} ${PLplot_LIBRARIES})
 
 
 
 if(BUILD_TESTS)
 
+
 set(goptical_core_test_srcs tests/test_2d_plot.cc tests/test_coordinates.cc tests/test_discrete_set.cc tests/test_materials.cc
 			    tests/test_patterns.cc tests/test_rendering.cc tests/test_shapes.cc)
-			    
+
 foreach(testsrc ${goptical_core_test_srcs})
     get_filename_component(testsrc_abs ${testsrc} ABSOLUTE)
     get_filename_component(testname ${testsrc} NAME_WE)
     message(STATUS "adding test: ${testname} from source ${testsrc_abs}")
     add_executable(${testname} ${testsrc_abs})
     target_link_libraries(${testname} goptical_core)
-
+    add_test(${testname} ${testname})    
 endforeach()
-   
 
 endif()
+
+target_compile_definitions(test_discrete_set PRIVATE -DTEST_WRITE)
+
+#environment variable for discrete_set test 
+set(ENV{srcdir} "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
+
+install(TARGETS goptical_core DESTINATION lib)
+install(DIRECTORY Goptical/ DESTINATION include)
+

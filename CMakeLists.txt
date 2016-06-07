@@ -9,6 +9,8 @@ if(BUILD_TESTS)
   enable_testing()
 endif()
 
+
+
 #GSL library- non negotiable
 find_library(gsl gsl)
 if(gsl STREQUAL "gsl-NOTFOUND")
@@ -21,35 +23,40 @@ message(FATAL_ERROR "couoldn't find GSL-CBLAS. Can't continue build")
 endif()
 
 
+macro(depend_lib_logic libname defname)
 
-#DIME library for DXF support
+  if(${${libname}_FOUND})
+    message(STATUS "${libname} found")
+    add_definitions(-DGOPTICAL_HAVE_${defname})
+  else()
+    message(WARNING "${libname} not found. Building without it")
+    set(NO_${libname} TRUE)
+  endif()
+
+
+endmacro()
+
 find_library(dime dime)
-if(dime STREQUAL "dime-NOTFOUND")
-message(WARNING "dime not found. Building without DXF support")
-set(NO_DXF TRUE)
-else()
-add_definitions(-DGOPTICAL_HAVE_DIME)
-endif()
+depend_lib_logic(dime DIME)
 
-#libGD for GD export
 find_library(gd gd)
-if(gd STREQUAL "gd-NOTFOUND")
-message(WARNING "gd not found. Building without GD rendering support")
-set(NO_GD TRUE)
-else()
-add_definitions(-DGOPTICAL_HAVE_GD)
-endif()
+depend_lib_logic(gd GD)
 
-#plplot
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
-find_package(PLplot)
 
-if(NOT ${PLplot-FOUND})
-message(WARNING "plplot not found. Building without plplot support")
-set(NO_PLPLOT TRUE)
-else()
-add_definitions(-DGOPTICAL_HAVE_PLPLOT)
-endif()
+find_package(PLplot)
+depend_lib_logic(PLplot PLPLOT)
+
+
+find_package(X11)
+depend_lib_logic(X11 X11)
+
+
+#explicitly disable op
+find_package(OpenGL)
+find_package(GLUT)
+depend_lib_logic(OpenGL GL)
+
 
 
 #enable hacks for cmake build
@@ -58,3 +65,8 @@ add_definitions(-DCMAKE_BUILD)
 
 add_subdirectory(goptical_core)
 add_subdirectory(goptical_design)
+
+option(BUILD_EXAMPLES "Build examples" ON)
+if(BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()	
