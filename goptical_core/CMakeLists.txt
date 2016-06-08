@@ -54,6 +54,8 @@ target_compile_definitions(test_discrete_set PRIVATE -DTEST_WRITE)
 #environment variable for discrete_set test 
 set(ENV{srcdir} "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 
-install(TARGETS goptical_core DESTINATION lib)
-install(DIRECTORY Goptical/ DESTINATION include)
+#TODO: include properties?
+install(TARGETS goptical_core DESTINATION ${CMAKE_INSTALL_LIBDIR} EXPORT goptical)
+install(DIRECTORY src/Goptical/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/Goptical)
+
 

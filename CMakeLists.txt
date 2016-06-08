@@ -3,6 +3,7 @@ project(goptical)
 
 include_directories(goptical_core/src)
 
+include(GNUInstallDirs)
 
 option(BUILD_TESTS "Build tests" ON)
 if(BUILD_TESTS)
@@ -10,7 +11,7 @@ if(BUILD_TESTS)
 endif()
 
 
-
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/Goptical)
 #GSL library- non negotiable
 find_library(gsl gsl)
 if(gsl STREQUAL "gsl-NOTFOUND")
@@ -70,3 +71,21 @@ option(BUILD_EXAMPLES "Build examples" ON)
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()	
+
+set(CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/goptical/)
+install(EXPORT goptical FILE gopticalTargets.cmake DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+
+#cmake export stuff
+
+set(GOPTICAL_VERSION 1.0)
+include(CMakePackageConfigHelpers)
+
+set(CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/goptical)
+
+configure_package_config_file(gopticalConfig.cmake.in gopticalConfig.cmake 
+			      INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+			      PATH_VARS INCLUDE_INSTALL_DIR)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gopticalConfig.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/goptical/)
+
+#TODO: build docs

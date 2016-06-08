@@ -1,0 +1,15 @@
+# Config file for the goptical package
+#It defines the following variables
+# GOPTICAL_LIBRARIES - goptical libraries to link agains
+# GOPTICAL_INCLUDE_DIR - goptical include directory
+
+@PACKAGE_INIT@
+
+set_and_check(goptical_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
+
+include(${CMAKE_CURRENT_LIST_DIR}/gopticalTargets.cmake)
+
+set(goptical_CORE_LIBRARY goptical_core)
+set(goptical_DESIGN_LIBRARY goptical_design)
+
+set(goptical_LIBRARIES "${goptical_core};${goptical_design}")
