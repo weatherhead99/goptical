@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 project(goptical)
 
+set(CMAKE_CXX_STANDARD 11)
+
 include_directories(goptical_core/src)
 
 include(GNUInstallDirs)
