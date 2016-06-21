@@ -11,7 +11,7 @@ if(BUILD_TESTS)
 endif()
 
 
-set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/Goptical)
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
 #GSL library- non negotiable
 find_library(gsl gsl)
 if(gsl STREQUAL "gsl-NOTFOUND")

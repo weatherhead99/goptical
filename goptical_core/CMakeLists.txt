@@ -56,6 +56,6 @@ set(ENV{srcdir} "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 
 #TODO: include properties?
 install(TARGETS goptical_core DESTINATION ${CMAKE_INSTALL_LIBDIR} EXPORT goptical)
-install(DIRECTORY src/Goptical/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/Goptical)
+install(DIRECTORY src/Goptical DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
