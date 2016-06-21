@@ -14,8 +14,8 @@ src/curve_grid.cc	    src/io_renderer.cc	       src/material_dielectric.cc	 src/
 src/curve_parabola.cc	    src/material_dispersion_table.cc  src/shape_polygon.cc	       src/trace_result.cc
 src/curve_polynomial.cc     src/material_herzberger.cc	 src/shape_rectangle.cc        src/trace_sequence.cc
 src/curve_rotational.cc     src/io_renderer_opengl.cc  src/material_metal.cc		 src/shape_regular_polygon.cc  src/trace_tracer.cc
-src/curve_sphere.cc	    src/io_renderer_plplot.cc  src/material_mirror.cc		 src/shape_ring.cc
-src/curve_spline.cc	    src/io_renderer_svg.cc     src/material_proxy.cc		 src/sys_container.cc)
+src/curve_sphere.cc	    src/material_mirror.cc		 src/shape_ring.cc       src/curve_spline.cc	    src/io_renderer_svg.cc     
+src/material_proxy.cc		 src/sys_container.cc)
 
 
 if(NOT NO_dime)
@@ -24,6 +24,10 @@ endif()
 
 if(NOT NO_gd)
 list(APPEND goptical_core_srcs src/io_renderer_gd.cc)
+endif()
+
+if(NOT NO_PLplot)
+list(APPEND goptical_core_srcs src/io_renderer_plplot.cc)
 endif()
 
 
