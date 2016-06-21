@@ -2,9 +2,17 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <stdexcept>
 #include <cmath>
 #include <vector>
+#include <iomanip>
+
+
+#include <algorithm>
+
+#include <Goptical/Error>
+
+using namespace Goptical;
 using std::vector;
 
 using std::cout;
@@ -14,20 +22,41 @@ zmfreader::zmfreader(const char* fname)
 {
   
   std::ifstream ifs(fname, std::ios::binary);
+
+  if(!ifs.is_open())
+  {
+    throw Error("couldn't open ZMF file");
+  };
+
+ read_from_stream(ifs,_version);
   
-  unsigned version;
-  ifs.read(reinterpret_cast<char*>(&version),4);
-  cout << "version: " << version << endl;
+  
+
+  if(_version != 1001)
+  {
+    throw std::logic_error("goptical does not support this ZMF version");
+  };
+  
+  zemax_lens lens(ifs);
+  
+  cout << "name: " << lens.name << endl;
+  
   
 
 }
+
+unsigned int zmfreader::getVersion() const
+{
+  return _version;
+}
+
+
 
 
 std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl, double enp)
 {
     auto iv = cos(6 * efl + 3 * enp);
     iv = cos(655 * M_PI / 180. * iv) + iv;
-    
     
     auto char_iter = raw_desc.begin();
     std::string out;
@@ -61,16 +90,43 @@ int decimal_expansion_digits(float val, int id1, int id2)
   
 }
 
-
-int end_swap(int i)
+zemax_lens::zemax_lens(std::istream& is)
 {
-  unsigned char b1, b2, b3, b4;
-
-  b1 = i & 255;
-  b2 = ( i >> 8 ) & 255;
-  b3 = ( i>>16 ) & 255;
-  b4 = ( i>>24 ) & 255;
-
-  return ((int)b1 << 24) + ((int)b2 << 16) + ((int)b3 << 8) + b4;
+    _zemax_lens_raw lr;
+    is.read(reinterpret_cast<char*>(&lr),sizeof(_zemax_lens_raw));
+    
+    name = std::string(lr.name);
+    name.erase(std::find_if(name.rbegin(), name.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), name.end());
+    
+    elements = lr.elements;
+    version = lr.version;
+    shp = lr.shp;
+    aspheric = lr.aspheric;
+    toroidal = lr.toroidal;
+    grin = lr.grin;
+    efl = lr.efl;
+    enp = lr.enp;
+    
+    
+    //read description
+    cout << "desclen: " << lr.desclen << endl;
+    std::string raw_desc;
+    raw_desc.resize(lr.desclen);
+    std::copy_n(std::istreambuf_iterator<char>(is),lr.desclen,raw_desc.begin());
+    
+    description = zmf_description_deobfuscate(std::string(raw_desc), efl, enp);
+    
+    cout << "description: " << description << endl;
+    
+    
 }
+
+zemax_lens::zemax_lens()
+{
+
+}
+
+
+
+
 

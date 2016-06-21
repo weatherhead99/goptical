@@ -108,9 +108,12 @@ if __name__ == "__main__":
     an  = ZMFReader(testfile)
     
     print( "version: " + str(an.version))
-    strs = an.ln.description.split("\n")
-    for s in strs:
-        print(s)
+#    strs = an.ln.description.split("\n")
+#    for s in strs:
+#        print(s)
+
+    print(an.ln.version)
+    print(an.ln.elements)
         
     a = an.ln.efl
     b = an.ln.enp        

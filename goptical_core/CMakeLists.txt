@@ -65,5 +65,8 @@ install(DIRECTORY src/Goptical DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
 #zemax zmf
+
+
 add_executable(zmf_test zemax_catalog/zmf_test.cpp zemax_catalog/zemax_zmf.cpp)
 target_include_directories(zmf_test PRIVATE zemax_catalog)
+file(COPY zemax_catalog/THORLABS.ZMF DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
