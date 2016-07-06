@@ -40,14 +40,28 @@ class ZMFReader(object):
             if self.version not in self.SUPPORTED_VERSIONS:
                 raise IndexError("unsupported ZMF file version")
         
-            self.ln = self._read_lens_struct(f)                
-            print(self.ln.name)
+            self.lenses = []        
+        
+            while True:
+        
+                ln = self._read_lens_struct(f)                
+            
+                if ln is None:
+                    break
+            
+                self.lenses.append(ln)
+                print(ln.name)
             
                 
             
             
     def _read_lens_struct(self,strm):
-        l = self.lens_struct.unpack(strm.read(self.lens_struct.size))
+        
+        data = strm.read(self.lens_struct.size)        
+        if data == '' :
+            return None
+        
+        l = self.lens_struct.unpack(data)
         
         print("description length:" + str(l[7]))
         
@@ -64,16 +78,7 @@ class ZMFReader(object):
                     efl = l[8],
                     enp = l[9],
                     description = self.zmf_obfuscate(desc_raw,l[8],l[9]))
-                    
-                    
-        
-        print(lens.efl)
-        print(lens.enp)
-
-        
-        #print(lens.description)
-        
-        
+                                            
         return lens
         
     def zmf_obfuscate(self,data, a, b):
@@ -112,10 +117,6 @@ if __name__ == "__main__":
 #    for s in strs:
 #        print(s)
 
-    print(an.ln.version)
-    print(an.ln.elements)
         
-    a = an.ln.efl
-    b = an.ln.enp        
         
         

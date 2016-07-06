@@ -66,12 +66,12 @@ install(DIRECTORY src/Goptical DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 #zemax zmf
 
-find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(Boost REQUIRED COMPONENTS program_options system filesystem)
 
 
 add_executable(zmf_test zemax_catalog/zmf_test.cpp zemax_catalog/zemax_zmf.cpp)
 add_executable(zmfdump zemax_catalog/zmfdump.cpp zemax_catalog/zemax_zmf.cpp)
-target_link_libraries(zmfdump ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(zmfdump ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 
 target_include_directories(zmf_test PRIVATE zemax_catalog)
 file(COPY zemax_catalog/THORLABS.ZMF DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

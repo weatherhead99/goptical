@@ -29,6 +29,9 @@ struct zemax_lens
 {
   zemax_lens(std::istream& is);
   zemax_lens();
+  
+  void read_from_stream(std::istream& is);
+  
   std::string name;
   lens_shape shp;
   int elements;

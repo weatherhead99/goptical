@@ -78,7 +78,7 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
     for(unsigned char c : raw_desc)
     {
       double k = 13.2 * ( iv + sin ( 17 * (i+3))) * (i++ + 1);
-      out += c ^ decimal_expansion_digits(k,4,7);
+      out += (char) (c ^ decimal_expansion_digits(k,4,7));
       
     };
   
@@ -103,13 +103,39 @@ unsigned char decimal_expansion_digits(double val, int id1, int id2)
   
   modf(f * pow(10,id2 - id1), &ipart);
   
-  return ipart;
+  
+  return floor(ipart);
   
 }
 
 zemax_lens::zemax_lens(std::istream& is)
 {
-    is.read(reinterpret_cast<char*>(&lr),sizeof(lr));
+    
+    //check valid description
+    
+      read_from_stream(is);
+    
+    
+}
+
+
+void zemax_lens::print_summary() const
+{
+  cout << "name: " << name << " elements: " << elements << " desclen: " << lr.desclen << endl;
+  
+}
+
+
+
+zemax_lens::zemax_lens()
+{
+
+}
+
+
+void zemax_lens::read_from_stream(std::istream& is)
+{
+      is.read(reinterpret_cast<char*>(&lr),sizeof(lr));
     
     name = std::string(lr.name);
     name.erase(std::find_if(name.rbegin(), name.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), name.end());
@@ -135,28 +161,9 @@ zemax_lens::zemax_lens(std::istream& is)
     };
     
     description = zmf_description_deobfuscate(std::string(raw_desc), efl, enp);
-    
-    //check valid description
-    
-    
-    
-    
-}
 
-
-void zemax_lens::print_summary() const
-{
-  cout << "name: " << name << " elements: " << elements << " desclen: " << lr.desclen << endl;
-  
-}
-
-
-
-zemax_lens::zemax_lens()
-{
 
 }
-
 
 
 

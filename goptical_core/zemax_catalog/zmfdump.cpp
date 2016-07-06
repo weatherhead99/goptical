@@ -3,8 +3,10 @@
 #include <iostream>
 #include <vector>
 
-#include <boost/program_options.hpp>
+#include <fstream>
 
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 using std::string;
 using std::vector;
@@ -20,12 +22,14 @@ int main(int argc, char** argv)
   po::options_description desc("dumps the contents of a ZMF file to text");
   po::positional_options_description pdesc;
   
-  pdesc.add("infile",-1);
+  pdesc.add("infile",1);
+  pdesc.add("outfile",1);
   
   desc.add_options()
     ("help", "show this help message")
     ("infile", po::value<string>(),"input ZMF file")
     ("outfile", po::value<string>(),"output file")
+    ("force,f", po::bool_switch()->default_value(false),"force overwrite of output file")
     ;
   
   po::variables_map vm;
@@ -34,7 +38,7 @@ int main(int argc, char** argv)
   
   if(vm.count("help"))
   {
-    cout <<"Usage: zmfdump infile [options]" << endl;
+    cout <<"Usage: zmfdump infile outfile [options]" << endl;
     cout << desc << endl;
     return 0;
   };
@@ -45,18 +49,64 @@ int main(int argc, char** argv)
     return -1;
   };
   
+  if(!vm.count("outfile"))
+  {
+    cout << "ERROR: no output file specified" << endl;
+    return -1;
+  };
+  
   auto fname = vm["infile"].as<string>();
-  cout << "file: " << fname << endl;
+  auto outfname = vm["outfile"].as<string>();
+  cout << "ZMF file: " << fname << endl;
+  
+  //check if output file exists
+  cout << "output file: " << outfname << endl;
+  
+  if(boost::filesystem::exists(outfname))
+  {
+    if(!vm["force"].as<bool>())
+    {
+      cout <<"ERROR: File exists (specify -f to overwrite)" << endl;
+      return -1;
+    }
+    else
+    {
+      cout << "overwriting " << outfname << endl;
+      boost::system::error_code errc;
+      boost::filesystem::remove(outfname,errc);
+      
+      if(errc)
+      {
+	cout << errc << endl;
+	return -1;
+      };
+      
+    }
+  }
   
   zmfreader reader(fname.c_str());
   
   
   auto lenses = reader.getLenses();
   
+  
   cout << "file version: " << reader.getVersion() << endl;
   cout << "read " << lenses.size() << " lenses" << endl;
   
   
   
+  std::ofstream ofs(outfname);
+  
+  if(!ofs.is_open())
+  {
+    cout << "ERROR: couldn't open output file" << endl;
+  }
+  
+  for( const auto& l : lenses)
+  {
+    ofs << l.description << endl;
+  };
+  
+  cout << "written to " << outfname << endl;
   
 };
