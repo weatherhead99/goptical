@@ -37,18 +37,31 @@ zmfreader::zmfreader(const char* fname)
     throw std::logic_error("goptical does not support this ZMF version");
   };
   
-  zemax_lens lens(ifs);
   
-  cout << "name: " << lens.name << endl;
+  while(!ifs.eof())
+  {
+//     cout << "position: "<< ifs.tellg() << endl;
+    zemax_lens l(ifs);
+    
+//     cout << "lens read: " << l.name << endl;
+    _lenses.push_back(std::move(l));
+    
+  }
   
-  
-
+    
 }
 
 unsigned int zmfreader::getVersion() const
 {
   return _version;
 }
+
+const vector< zemax_lens >& zmfreader::getLenses() const
+{
+  return _lenses;
+
+}
+
 
 
 
@@ -62,7 +75,7 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
     std::string out;
     
     int i=0;
-    for(char c : raw_desc)
+    for(unsigned char c : raw_desc)
     {
       double k = 13.2 * ( iv + sin ( 17 * (i+3))) * (i++ + 1);
       out += c ^ decimal_expansion_digits(k,4,7);
@@ -74,10 +87,14 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
 
 }
 
-int decimal_expansion_digits(float val, int id1, int id2)
+unsigned char decimal_expansion_digits(double val, int id1, int id2)
 {
-  int places = ceil(log10(val));
+  
+//   cout << "raw val: " << val << endl;
+  int places = ceil(log10(abs(val)));
   val /= pow(10,places);
+  
+//   cout << "val: " << val << endl;
   
   auto k = val* pow(10,id1 - 1);
   
@@ -92,8 +109,7 @@ int decimal_expansion_digits(float val, int id1, int id2)
 
 zemax_lens::zemax_lens(std::istream& is)
 {
-    _zemax_lens_raw lr;
-    is.read(reinterpret_cast<char*>(&lr),sizeof(_zemax_lens_raw));
+    is.read(reinterpret_cast<char*>(&lr),sizeof(lr));
     
     name = std::string(lr.name);
     name.erase(std::find_if(name.rbegin(), name.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), name.end());
@@ -109,17 +125,32 @@ zemax_lens::zemax_lens(std::istream& is)
     
     
     //read description
-    cout << "desclen: " << lr.desclen << endl;
     std::string raw_desc;
     raw_desc.resize(lr.desclen);
-    std::copy_n(std::istreambuf_iterator<char>(is),lr.desclen,raw_desc.begin());
+    std::copy_n(std::istreambuf_iterator<char>(is),lr.desclen+1,raw_desc.begin());
+    
+    if(raw_desc.size() != lr.desclen)
+    {
+      throw std::logic_error("description size mismatch");
+    };
     
     description = zmf_description_deobfuscate(std::string(raw_desc), efl, enp);
     
-    cout << "description: " << description << endl;
+    //check valid description
+    
+    
     
     
 }
+
+
+void zemax_lens::print_summary() const
+{
+  cout << "name: " << name << " elements: " << elements << " desclen: " << lr.desclen << endl;
+  
+}
+
+
 
 zemax_lens::zemax_lens()
 {

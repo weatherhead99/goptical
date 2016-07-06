@@ -13,9 +13,9 @@ src/curve_foucault.cc	    src/io_renderer_axes.cc    src/material_conrady.cc		 s
 src/curve_grid.cc	    src/io_renderer.cc	       src/material_dielectric.cc	 src/shape_infinite.cc	       src/sys_system.cc
 src/curve_parabola.cc	    src/material_dispersion_table.cc  src/shape_polygon.cc	       src/trace_result.cc
 src/curve_polynomial.cc     src/material_herzberger.cc	 src/shape_rectangle.cc        src/trace_sequence.cc
-src/curve_rotational.cc     src/io_renderer_opengl.cc  src/material_metal.cc		 src/shape_regular_polygon.cc  src/trace_tracer.cc
-src/curve_sphere.cc	    src/material_mirror.cc		 src/shape_ring.cc       src/curve_spline.cc	    src/io_renderer_svg.cc     
-src/material_proxy.cc		 src/sys_container.cc)
+src/curve_rotational.cc     src/io_renderer_opengl.cc  src/material_metal.cc	 src/shape_regular_polygon.cc  src/trace_tracer.cc
+src/curve_sphere.cc	    src/material_mirror.cc	 src/shape_ring.cc       src/curve_spline.cc	    src/io_renderer_svg.cc     
+src/material_proxy.cc	 src/sys_container.cc)
 
 
 if(NOT NO_dime)
@@ -66,7 +66,12 @@ install(DIRECTORY src/Goptical DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 #zemax zmf
 
+find_package(Boost REQUIRED COMPONENTS program_options)
+
 
 add_executable(zmf_test zemax_catalog/zmf_test.cpp zemax_catalog/zemax_zmf.cpp)
+add_executable(zmfdump zemax_catalog/zmfdump.cpp zemax_catalog/zemax_zmf.cpp)
+target_link_libraries(zmfdump ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
 target_include_directories(zmf_test PRIVATE zemax_catalog)
 file(COPY zemax_catalog/THORLABS.ZMF DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

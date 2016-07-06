@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+using std::vector;
 
 enum class lens_shape
 { _, E, B, P, M};
@@ -38,6 +40,11 @@ struct zemax_lens
   double enp;
   std::string description;
   
+  void print_summary() const;
+  
+private:
+  _zemax_lens_raw lr;
+  
 };
 
 
@@ -45,12 +52,13 @@ class zmfreader
 {
 public:
   zmfreader(const char* fname);
-  
   unsigned getVersion() const;
+  
+  const vector<zemax_lens>& getLenses() const;
   
 private:
   
-  
+  vector<zemax_lens> _lenses;
   unsigned _version;
   
 };
@@ -58,7 +66,7 @@ private:
 
 std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl, double enp);
 
-int decimal_expansion_digits(float val, int id1, int id2);
+unsigned char decimal_expansion_digits(double val, int id1, int id2);
 
 template <typename T> T end_swap(T i)
 {
