@@ -123,22 +123,10 @@ def numeric_places(num):
     return int(f2)
 
 if __name__ == "__main__":
-    #an  = ZMFReader(testfile)
+    an  = ZMFReader(testfile)
     
-    #l = an.lenses[2]
-    #print(l.description)
-    
-    an = ZMFReader_debug(testfile,2)
-    
-    print(an.ln.description)
-    
-    ords = map(ord, an.rawdesc)
-    print(ords)
-    
-#    strs = an.ln.description.split("\n")
-#    for s in strs:
-#        print(s)
-
+    for l in an.lenses:
+      print(l.description)
         
         
         

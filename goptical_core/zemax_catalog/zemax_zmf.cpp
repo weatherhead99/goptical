@@ -7,6 +7,7 @@
 #include <vector>
 #include <iomanip>
 
+#include <sstream>
 
 #include <algorithm>
 
@@ -93,7 +94,16 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
     for(unsigned char c : raw_desc)
     {
       double k = 13.2 * ( iv + sin ( 17 * (i+3))) * (i++ + 1);
-      out += (char) (c ^ decimal_expansion_digits(k,4,7));
+//       char co=   (c ^ decimal_expansion_digits(k,4,7));
+      
+      char co = (c ^ decimal_expansion_digits_slow(k,4,7));
+      
+      
+     //FIXME: still some occasional off chars
+      
+	
+	
+      out += co;
       
     };
   
@@ -102,7 +112,7 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
 
 }
 
-unsigned char decimal_expansion_digits(double val, int id1, int id2)
+int decimal_expansion_digits(double val, int id1, int id2)
 {
   
   int sign = sgn(val);
@@ -113,7 +123,7 @@ unsigned char decimal_expansion_digits(double val, int id1, int id2)
   
   
   
-//   cout << "val: " << val << " ";
+  //fix for cases where val is negative (don't blame me, blame ZEMAX)
   if(sign < 0)
   {
     id1 -= 1;
@@ -132,6 +142,24 @@ unsigned char decimal_expansion_digits(double val, int id1, int id2)
   return floor(ipart);
   
 }
+
+int decimal_expansion_digits_slow(double val, int id1, int id2)
+{
+  
+  std::ostringstream oss;
+  oss.precision(8);
+  oss << std::scientific << val;
+  
+//   cout <<"scientific:" <<  oss.str() << endl;
+  auto digits = oss.str().substr(id1, id2 - id1);
+  
+//   cout << "digits: " << digits << endl;
+  
+  return std::stoi(digits);
+  
+}
+
+
 
 zemax_lens::zemax_lens(std::ifstream& is)
 {
