@@ -73,9 +73,9 @@ private:
 
 std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl, double enp);
 
-int  decimal_expansion_digits(double val, int id1, int id2);
+unsigned  decimal_expansion_digits(double val, int id1, int id2);
 
-int decimal_expansion_digits_slow(double val, int id1, int id2);
+unsigned decimal_expansion_digits_slow(double val, int id1, int id2);
 
 
 template <typename T> T end_swap(T i)

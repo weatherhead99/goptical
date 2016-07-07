@@ -91,19 +91,14 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
     std::string out;
     
     int i=0;
-    for(unsigned char c : raw_desc)
+    for(char c : raw_desc)
     {
       double k = 13.2 * ( iv + sin ( 17 * (i+3))) * (i++ + 1);
 
 //TODO: the fast version is around 3x speedup, make it work      
 //       char co=   (c ^ decimal_expansion_digits(k,4,7));
-      char co = (c ^ decimal_expansion_digits_slow(k,4,7));
+      char co = (static_cast<unsigned>(c) ^ decimal_expansion_digits_slow(k,4,7));
       
-      
-     //FIXME: still some occasional off chars
-      
-	
-	
       out += co;
       
     };
@@ -113,7 +108,7 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
 
 }
 
-int decimal_expansion_digits(double val, int id1, int id2)
+unsigned decimal_expansion_digits(double val, int id1, int id2)
 {
   
   int sign = sgn(val);
@@ -122,40 +117,39 @@ int decimal_expansion_digits(double val, int id1, int id2)
   int places = ceil(log10(val));
   val /= pow(10,places);
   
-  
-  
-  //fix for cases where val is negative (don't blame me, blame ZEMAX)
+    
+  double k;
   if(sign < 0)
   {
-    id1 -= 1;
-    id2 -= 1;
+    k = val * pow(10,id1-2);
     
+  }
+  else
+  {
+    k  = val * pow(10,id1-1);
   };
   
-  auto k = val* pow(10,id1 - 1);
   
   double ipart;
   auto f = modf(k,&ipart);
+
   
   modf(f * pow(10,id2 - id1), &ipart);
+  cout << "ipart: " <<ipart;
   
   
   return floor(ipart);
   
 }
 
-int decimal_expansion_digits_slow(double val, int id1, int id2)
+unsigned decimal_expansion_digits_slow(double val, int id1, int id2)
 {
   
   std::ostringstream oss;
   oss.precision(8);
   oss << std::scientific << val;
   
-//   cout <<"scientific:" <<  oss.str() << endl;
   auto digits = oss.str().substr(id1, id2 - id1);
-  
-//   cout << "digits: " << digits << endl;
-  
   return std::stoi(digits);
   
 }
@@ -164,12 +158,9 @@ int decimal_expansion_digits_slow(double val, int id1, int id2)
 
 zemax_lens::zemax_lens(std::ifstream& is)
 {
-    
     //check valid description
-    
       read_from_stream(is);
-    
-    
+       
 }
 
 
