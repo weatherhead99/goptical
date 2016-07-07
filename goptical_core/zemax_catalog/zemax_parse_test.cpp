@@ -29,5 +29,8 @@ int main(int argc, char** argv)
      
      cout << "version: " << parsed_lens.version << endl;
      cout << "mode: " << parsed_lens.mode << endl;
+     cout << "name: " << parsed_lens.name << endl;
+     cout << "lang: " << parsed_lens.lang << endl;	
+     cout << "ENPD: " << parsed_lens.enpd << endl;
   
 };
