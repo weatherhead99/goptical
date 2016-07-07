@@ -18,17 +18,16 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-zmfreader::zmfreader(const char* fname)
+zmfreader::zmfreader(const char* fname) : _ifs(fname,std::ios::binary)
 {
   
-  std::ifstream ifs(fname, std::ios::binary);
-
-  if(!ifs.is_open())
+  
+  if(!_ifs.is_open())
   {
     throw Error("couldn't open ZMF file");
   };
 
- read_from_stream(ifs,_version);
+ read_from_stream(_ifs,_version);
   
   
 
@@ -37,31 +36,47 @@ zmfreader::zmfreader(const char* fname)
     throw std::logic_error("goptical does not support this ZMF version");
   };
   
-  
-  while(!ifs.eof())
-  {
-//     cout << "position: "<< ifs.tellg() << endl;
-    zemax_lens l(ifs);
-    
-//     cout << "lens read: " << l.name << endl;
-    _lenses.push_back(std::move(l));
-    
-  }
-  
     
 }
+
+
+zmfreader::~zmfreader()
+{
+  
+
+}
+
 
 unsigned int zmfreader::getVersion() const
 {
   return _version;
 }
 
-const vector< zemax_lens >& zmfreader::getLenses() const
+const vector< zemax_lens >& zmfreader::getLenses()
 {
+  
+  
+  while(!_ifs.eof())
+  {
+//     cout << "position: "<< ifs.tellg() << endl;
+    zemax_lens l(_ifs);
+    
+//     cout << "lens read: " << l.name << endl;
+    _lenses.push_back(std::move(l));
+    
+  }
+  
   return _lenses;
 
 }
 
+
+const zemax_lens zmfreader::getLens()
+{
+  zemax_lens l(_ifs);
+  return l;
+
+}
 
 
 
@@ -71,7 +86,7 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
     auto iv = cos(6 * efl + 3 * enp);
     iv = cos(655 * M_PI / 180. * iv) + iv;
     
-    auto char_iter = raw_desc.begin();
+    
     std::string out;
     
     int i=0;
@@ -90,11 +105,21 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
 unsigned char decimal_expansion_digits(double val, int id1, int id2)
 {
   
-//   cout << "raw val: " << val << endl;
-  int places = ceil(log10(abs(val)));
+  int sign = sgn(val);
+//get into standard form
+  val = fabs(val);
+  int places = ceil(log10(val));
   val /= pow(10,places);
   
-//   cout << "val: " << val << endl;
+  
+  
+//   cout << "val: " << val << " ";
+  if(sign < 0)
+  {
+    id1 -= 1;
+    id2 -= 1;
+    
+  };
   
   auto k = val* pow(10,id1 - 1);
   
@@ -108,7 +133,7 @@ unsigned char decimal_expansion_digits(double val, int id1, int id2)
   
 }
 
-zemax_lens::zemax_lens(std::istream& is)
+zemax_lens::zemax_lens(std::ifstream& is)
 {
     
     //check valid description
@@ -125,6 +150,11 @@ void zemax_lens::print_summary() const
   
 }
 
+unsigned int zemax_lens::getdesclen() const
+{
+  return lr.desclen;
+
+}
 
 
 zemax_lens::zemax_lens()
@@ -133,7 +163,7 @@ zemax_lens::zemax_lens()
 }
 
 
-void zemax_lens::read_from_stream(std::istream& is)
+void zemax_lens::read_from_stream(std::istream& is, string* rawdesc)
 {
       is.read(reinterpret_cast<char*>(&lr),sizeof(lr));
     
@@ -161,6 +191,14 @@ void zemax_lens::read_from_stream(std::istream& is)
     };
     
     description = zmf_description_deobfuscate(std::string(raw_desc), efl, enp);
+    
+    if(rawdesc != nullptr)
+    {
+      std::copy(raw_desc.begin(),raw_desc.end(),rawdesc->begin());
+      
+      
+    };
+    
 
 
 }

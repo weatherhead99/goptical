@@ -2,7 +2,10 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+
 using std::vector;
+using std::string;
 
 enum class lens_shape
 { _, E, B, P, M};
@@ -27,10 +30,11 @@ struct _zemax_lens_raw
 
 struct zemax_lens
 {
-  zemax_lens(std::istream& is);
+  zemax_lens(std::ifstream& is);
   zemax_lens();
   
-  void read_from_stream(std::istream& is);
+  void read_from_stream(std::istream& is,string* rawdesc = nullptr);
+  
   
   std::string name;
   lens_shape shp;
@@ -44,7 +48,7 @@ struct zemax_lens
   std::string description;
   
   void print_summary() const;
-  
+  unsigned getdesclen() const;
 private:
   _zemax_lens_raw lr;
   
@@ -56,11 +60,11 @@ class zmfreader
 public:
   zmfreader(const char* fname);
   unsigned getVersion() const;
-  
-  const vector<zemax_lens>& getLenses() const;
-  
+  ~zmfreader();
+  const vector<zemax_lens>& getLenses() ;
+  const zemax_lens getLens();
 private:
-  
+  std::ifstream _ifs;
   vector<zemax_lens> _lenses;
   unsigned _version;
   
@@ -84,6 +88,11 @@ template <typename T> T end_swap(T i)
   
   
 }
+
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 
 
 template <typename T, typename strm> inline void read_from_stream(strm& is, T& var)

@@ -19,15 +19,28 @@ int main(int argc, char** argv)
   
   cout << "ZMF file version: " << reader.getVersion() << endl;
   
-  auto lenses = reader.getLenses();
+  //auto lenses = reader.getLenses();
   
-  for (auto& l : lenses)
+  //print out rawdesc ords
+  for(int i=0 ;i < 2; i++)
   {
-    l.print_summary();
-  }
-
+    reader.getLens();
+    
+  };
   
-  cout << lenses[4].description << endl;
+  //this is the one we want
+  cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+  auto l = reader.getLens();
   
+  
+  cout << l.description << endl;
+  
+//   for (auto c : l.description)
+//   {
+//     cout << static_cast<unsigned> (c) << ", ";
+//     
+//   };
+  
+   
 };
   

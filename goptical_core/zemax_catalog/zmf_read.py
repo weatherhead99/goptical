@@ -33,39 +33,38 @@ class ZMFReader(object):
               3 : "P",
                4 : "M"}
     def __init__(self,fname):
-        with io.open(fname,"rb") as f:
+        self._stream_handle(fname, self._lens_readall_fun)
+            
+    def _stream_handle(self,fname,fun,funargs=()):
+	with io.open(fname,"rb") as f:
             head = Struct("<I")
             version = head.unpack(f.read(4))
             self.version = version[0]
             if self.version not in self.SUPPORTED_VERSIONS:
                 raise IndexError("unsupported ZMF file version")
+            fun(f,*funargs)
         
-            self.lenses = []        
-        
-            while True:
-        
-                ln = self._read_lens_struct(f)                
+    def _lens_readall_fun(self,f):
+	self.lenses = []
+	while True:
+	  ln = self._read_lens_struct(f)
+	  if ln is None:
+	    break
+	  
+	  self.lenses.append(ln)
             
-                if ln is None:
-                    break
-            
-                self.lenses.append(ln)
-                print(ln.name)
-            
-                
-            
-            
-    def _read_lens_struct(self,strm):
+    def _read_lens_struct(self,strm,return_desc_raw=False):
         
         data = strm.read(self.lens_struct.size)        
-        if data == '' :
+        if data == u'' :
             return None
         
         l = self.lens_struct.unpack(data)
         
-        print("description length:" + str(l[7]))
+        #print("description length:" + str(l[7]))
         
         desc_raw = strm.read(l[7])        
+        
         assert len(desc_raw) == l[7]
         
         lens = Lens( name= l[0].decode("latin1").strip("\0"),
@@ -79,6 +78,9 @@ class ZMFReader(object):
                     enp = l[9],
                     description = self.zmf_obfuscate(desc_raw,l[8],l[9]))
                                             
+        if(return_desc_raw):
+	  return lens,desc_raw
+	
         return lens
         
     def zmf_obfuscate(self,data, a, b):
@@ -92,7 +94,18 @@ class ZMFReader(object):
         return data.tostring()
         
         
-
+class ZMFReader_debug(ZMFReader):
+    def __init__(self,fname,n):
+	self._stream_handle(fname, self._lens_rawdesc_fun, [n])
+      
+    def _lens_rawdesc_fun(self,f,n):
+      
+	#discard n lenses
+	for i in xrange(n):
+	    self._read_lens_struct(f)
+	    
+	self.ln,self.rawdesc = self._read_lens_struct(f,True)
+	   
 
 def format_places(num):
     k = int("{:.8e}".format(num)[4:7])
@@ -110,9 +123,18 @@ def numeric_places(num):
     return int(f2)
 
 if __name__ == "__main__":
-    an  = ZMFReader(testfile)
+    #an  = ZMFReader(testfile)
     
-    print( "version: " + str(an.version))
+    #l = an.lenses[2]
+    #print(l.description)
+    
+    an = ZMFReader_debug(testfile,2)
+    
+    print(an.ln.description)
+    
+    ords = map(ord, an.rawdesc)
+    print(ords)
+    
 #    strs = an.ln.description.split("\n")
 #    for s in strs:
 #        print(s)

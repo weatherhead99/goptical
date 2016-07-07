@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <locale>
 
 #include <fstream>
 
@@ -94,9 +95,8 @@ int main(int argc, char** argv)
   cout << "read " << lenses.size() << " lenses" << endl;
   
   
-  
   std::ofstream ofs(outfname);
-  
+
   if(!ofs.is_open())
   {
     cout << "ERROR: couldn't open output file" << endl;
