@@ -94,8 +94,9 @@ std::string zmf_description_deobfuscate(const std::string& raw_desc, double efl,
     for(unsigned char c : raw_desc)
     {
       double k = 13.2 * ( iv + sin ( 17 * (i+3))) * (i++ + 1);
+
+//TODO: the fast version is around 3x speedup, make it work      
 //       char co=   (c ^ decimal_expansion_digits(k,4,7));
-      
       char co = (c ^ decimal_expansion_digits_slow(k,4,7));
       
       
