@@ -26,9 +26,8 @@ if(NOT NO_gd)
 list(APPEND goptical_core_srcs src/io_renderer_gd.cc)
 endif()
 
-
 add_library(goptical_core SHARED ${goptical_core_srcs})
-target_link_libraries(goptical_core  gsl gslcblas ${X11_LIBRARIES} ${OPENGL_LIBRARIES} ${PLplot_LIBRARIES})
+target_link_libraries(goptical_core  gsl gslcblas ${X11_LIBRARIES} ${OPENGL_LIBRARIES} ${PLplot_LIBRARIES} ${GLUT_LIBRARIES})
 
 
 
